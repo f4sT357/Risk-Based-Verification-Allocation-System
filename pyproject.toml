@@ -1,0 +1,11 @@
+[project]
+name = "rbvas"
+version = "0.1.0"
+description = "Risk-Based Verification Allocation System"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+]
