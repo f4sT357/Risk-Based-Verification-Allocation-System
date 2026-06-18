@@ -1,0 +1,159 @@
+
+---
+
+## ■ PyQt6 コーディング規約（必須制約）
+
+あなたはPyQt6アプリケーションを生成する。
+
+### 1. 基本構造（必須）
+
+すべてのアプリは以下構造を厳守する：
+
+```python
+import sys
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget
+```
+
+* `QApplication` は必ず1回だけ生成する
+* `sys.argv` を必ず渡す
+* `app.exec()` を必ず最後に呼ぶ
+
+---
+
+### 2. ウィンドウ構造ルール
+
+* UIは必ず `QMainWindow` または `QWidget` を継承して作る
+* `self.show()` を必ず呼ぶ
+* ウィンドウは必ず変数で保持する（GC防止）
+
+例：
+
+```python
+window = MainWindow()
+window.show()
+```
+
+---
+
+### 3. レイアウト必須ルール
+
+* レイアウトなしでウィジェットを配置しない
+* 必ず `QVBoxLayout` or `QHBoxLayout` を使用する
+
+```python
+from PyQt6.QtWidgets import QVBoxLayout
+```
+
+---
+
+### 4. シグナル接続ルール
+
+* すべてのボタンは必ず `.clicked.connect()` を使う
+* lambda多用は禁止（可読性優先）
+
+```python
+button.clicked.connect(self.on_click)
+```
+
+---
+
+### 5. スコープ・GC対策
+
+* UIコンポーネントは必ず `self.` に保持する
+
+❌ NG
+
+```python
+button = QPushButton("test")
+```
+
+⭕ OK
+
+```python
+self.button = QPushButton("test")
+```
+
+---
+
+### 6. main関数テンプレート（固定）
+
+必ずこの形式：
+
+```python
+def main():
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+### 7. 禁止事項
+
+* `app.exec()` の省略禁止
+* `show()` の省略禁止
+* GUIロジックをmain関数に書くこと禁止
+* ダミー実装（pass / TODO）禁止
+* 未接続ボタン禁止
+
+---
+
+### 8. エラー耐性ルール
+
+* 例外を握りつぶさない
+* GUI内部でtry/exceptを乱用しない
+* 失敗時はprintで原因を出す
+
+---
+
+### 9. 出力要件
+
+* 完全に実行可能な単一Pythonファイルとして出力する
+* 外部依存はPyQt6と標準ライブラリのみ
+* 疑似コード禁止
+
+---
+
+# ■ 最小動作スケルトン（参照用）
+
+```python
+import sys
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("PyQt6 App")
+
+        self.central = QWidget()
+        self.setCentralWidget(self.central)
+
+        self.layout = QVBoxLayout()
+        self.central.setLayout(self.layout)
+
+        self.label = QLabel("Ready")
+        self.layout.addWidget(self.label)
+
+        self.button = QPushButton("Click")
+        self.button.clicked.connect(self.on_click)
+        self.layout.addWidget(self.button)
+
+    def on_click(self):
+        self.label.setText("Clicked")
+
+def main():
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
+
+if __name__ == "__main__":
+    main()
+```
+
+---
